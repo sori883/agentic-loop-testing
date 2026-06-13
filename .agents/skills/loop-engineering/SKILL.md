@@ -43,6 +43,7 @@ description: Coding agent のループを設計・実行するための Skill。
 backend 固有の memory rule はこの Skill に書かない。
 
 - Linear が設定されている場合は、Linear Document、Issue、Comment の読み取りと、実行ログ、検証、エスカレーションの記録に `$linear-memory` を使う。
+- Linear の進捗状態は `$linear-memory` の State Machine に従って status / label / Comment に反映する。
 - GitHub の branch、PR、CI、review comment を扱う場合は `$github-workflow` を使う。
 - 実装を伴う場合は `$tdd-cycle` を使い、計画、E2E/受け入れテスト、最小実装、テスト通過、リファクタリングのサイクルを守る。
 - 設計、テスト、実装、リファクタリング、最終検証の各工程後は `$cross-review-gates` を使い、担当 agent とは別 agent にクロスレビューさせる。
