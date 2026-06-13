@@ -1,0 +1,4 @@
+interface:
+  display_name: "TDD Cycle"
+  short_description: "t-wada流TDDサイクルを実行する"
+  default_prompt: "$tdd-cycle を使って、計画、E2Eテスト、実装、テスト通過、リファクタリングの順に進めてください。"

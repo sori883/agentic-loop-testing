@@ -1,0 +1,12 @@
+interface:
+  display_name: "GitHub Workflow"
+  short_description: "GitHubのPR、CI、reviewを扱う"
+  default_prompt: "$github-workflow を使って、GitHubのbranch、PR、CI、review commentを安全に扱ってください。"
+
+dependencies:
+  tools:
+    - type: "mcp"
+      value: "github"
+      description: "GitHub MCP server"
+      transport: "streamable_http"
+      url: "https://api.githubcopilot.com/mcp/"

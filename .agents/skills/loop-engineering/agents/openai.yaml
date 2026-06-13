@@ -1,0 +1,4 @@
+interface:
+  display_name: "Loop Engineering"
+  short_description: "maker/checker型のagent loopを動かす"
+  default_prompt: "$loop-engineering を使って、maker/checker分離と設定済みmemory backendを前提にcoding-agent loopを実行してください。"
