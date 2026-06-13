@@ -34,8 +34,9 @@ description: Coding agent のループを設計・実行するための Skill。
    - `implementer` は範囲を絞って変更する。
    - `verifier` は Goal と Acceptance Criteria に照らして確認する。
 4. 実装を伴う作業では `$tdd-cycle` を使い、Plan、Memory、Red、Green、Refactor、Verify の順に進める。
-5. 各 agent が何を読み書きできるかは memory backend skill に従う。
-6. 検証が通る、人間が明示的に停止する、またはエスカレーションが必要になるまで進める。
+5. 各工程後に `$cross-review-gates` を使い、担当 agent とは別 agent で review gate を通す。
+6. 各 agent が何を読み書きできるかは memory backend skill に従う。
+7. 検証と review gate が通る、人間が明示的に停止する、またはエスカレーションが必要になるまで進める。
 
 ## Memory Backend
 
@@ -44,6 +45,7 @@ backend 固有の memory rule はこの Skill に書かない。
 - Linear が設定されている場合は、Linear Document、Issue、Comment の読み取りと、実行ログ、検証、エスカレーションの記録に `$linear-memory` を使う。
 - GitHub の branch、PR、CI、review comment を扱う場合は `$github-workflow` を使う。
 - 実装を伴う場合は `$tdd-cycle` を使い、計画、E2E/受け入れテスト、最小実装、テスト通過、リファクタリングのサイクルを守る。
+- 設計、テスト、実装、リファクタリング、最終検証の各工程後は `$cross-review-gates` を使い、担当 agent とは別 agent にクロスレビューさせる。
 - 別の backend が設定されている場合は、その backend 用 Skill を使う。
 - backend が設定されていない場合は、永続 memory があるふりをしない。最終応答に結果を要約し、永続化していないことを明記する。
 
@@ -55,6 +57,7 @@ backend 固有の memory rule はこの Skill に書かない。
 - 検証手段がない場合は、最小限有用な確認を行い、その限界を記録する。
 - 意味のある変更では、implementer だけを成功判定者にしない。
 - verifier が `REJECT` した場合は、修正して再検証するか、明確な理由とともにエスカレーションする。
+- 各工程後の reviewer が `REJECT` した場合は、次工程へ進まず、対象 phase を修正して再レビューする。
 - memory backend がある場合は、検証結果をそこに記録する。
 
 ## Escalation Rules
@@ -78,6 +81,7 @@ Use $loop-engineering.
 Use $linear-memory when Linear is the memory backend.
 Use $github-workflow when touching GitHub branches, PRs, CI, or review comments.
 Use $tdd-cycle when implementation is required.
+Use $cross-review-gates after design, test, implementation, refactor, and final verification phases.
 Discover or accept one bounded work item.
 Use maker/checker separation when work is non-trivial.
 Verify before completion.
