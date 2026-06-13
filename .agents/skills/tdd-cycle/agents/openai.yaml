@@ -1,4 +1,4 @@
 interface:
-  display_name: "TDD Cycle"
-  short_description: "レビュー付きt-wada流TDDサイクルを実行する"
-  default_prompt: "$tdd-cycle を使って、計画、E2Eテスト、実装、テスト通過、リファクタリング、各工程後の別agentレビューの順に進めてください。"
+  display_name: "TDD サイクル"
+  short_description: "レビュー付き t-wada 流 TDD サイクルを実行する"
+  default_prompt: "$tdd-cycle を使って、計画、E2E テスト、実装、テスト通過、リファクタリング、各工程後の別エージェントレビューの順に進めてください。"
