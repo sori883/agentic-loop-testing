@@ -1,78 +1,79 @@
 ---
 name: cross-review-gates
-description: 各工程後に、担当した agent とは別の agent で独立レビューを行うための Skill。設計、テスト、実装、リファクタリング、最終検証の各 phase で、成果物だけを対象に cross-check し、APPROVE / REJECT / ESCALATE を判定する必要があるときに使う。t-wada 流 TDD、Loop Engineering、Linear memory と組み合わせて使う。
+description: 各工程後に、担当したエージェントとは別のエージェントで独立レビューを行うための Skill。設計、テスト、実装、リファクタリング、最終検証の各 phase で、成果物だけを対象にクロスチェックし、APPROVE / REJECT / ESCALATE を判定する必要があるときに使う。t-wada 流 TDD、Loop Engineering、Linear memory と組み合わせて使う。
 ---
 
-# Cross Review Gates
+# クロスレビューゲート
 
 ## 概要
 
-各工程の完了後に、担当 agent とは別の read-only reviewer agent を起動してクロスチェックする。レビューは改善作業ではなく、次の工程に進んでよいかを判定する gate として扱う。
+各工程の完了後に、担当エージェントとは別の読み取り専用レビュー担当エージェントを起動してクロスチェックする。レビューは改善作業ではなく、次の工程に進んでよいかを判定する gate として扱う。
 
-## Core Rule
+## 基本ルール
 
-- 工程を実行した agent と、その工程をレビューする agent は同一にしない。
-- Reviewer は新しい subagent として起動する。
-- Reviewer には成果物、Goal、Acceptance Criteria、関連 diff、test output、Linear memory など、判定に必要な evidence だけを渡す。
-- Reviewer に actor の chain-of-thought や隠れた意図を渡さない。
-- Reviewer は artifact を変更しない。判定と根拠だけを返す。
+- 工程を実行したエージェントと、その工程をレビューするエージェントは同一にしない。
+- レビュー担当は新しいサブエージェントとして起動する。
+- レビュー担当には成果物、目的、受け入れ条件、関連差分、テスト出力、Linear memory など、判定に必要な証拠だけを渡す。
+- レビュー担当に実行者の chain-of-thought や隠れた意図を渡さない。
+- レビュー担当は成果物を変更しない。判定と根拠だけを返す。
+- controller 以外のエージェントが Linear/GitHub の mutation を直接行った証拠がある場合は、`APPROVE` せず `ESCALATE` として扱う。
 - `APPROVE` なしに次工程へ進まない。
 
-## Review Gates
+## レビューゲート
 
 標準 gate:
 
-1. Design Review: Plan と Test List が Goal / Acceptance Criteria を満たすか確認する。
-2. Test Review: 追加した E2E/受け入れテストが仕様を表しており、期待通り Red になっているか確認する。
-3. Implementation Review: Green のための実装が最小で、テストを不正に弱めていないか確認する。
-4. Refactor Review: 振る舞いを変えずに整理され、テストが通ったままか確認する。
-5. Verification Review: 最終検証が十分で、残リスクが明示されているか確認する。
+1. 設計レビュー: 計画とテストリストが目的/受け入れ条件を満たすか確認する。
+2. テストレビュー: 追加した E2E/受け入れテストが仕様を表しており、期待通り Red になっているか確認する。
+3. 実装レビュー: Green のための実装が最小で、テストを不正に弱めていないか確認する。
+4. リファクタリングレビュー: 振る舞いを変えずに整理され、テストが通ったままか確認する。
+5. 検証レビュー: 最終検証が十分で、残リスクが明示されているか確認する。
 
-## Reviewer Output
+## レビュー担当の出力
 
-Reviewer は次の形式で返す。
+レビュー担当は次の形式で返す。
 
 ```md
-## Phase Review
+## 工程レビュー
 
-Phase:
-Actor:
-Reviewer:
-Verdict: APPROVE | REJECT | ESCALATE
+工程:
+実行者:
+レビュー担当:
+判定: APPROVE | REJECT | ESCALATE
 
-## Evidence
+## 根拠
 
-## Failed Criteria
+## 満たしていない基準
 
-## Required Next Action
+## 必要な次アクション
 
-## Residual Risk
+## 残るリスク
 ```
 
-`APPROVE` は、次工程へ進んでよい場合だけ使う。  
-`REJECT` は、actor が修正して同じ gate を再実行できる場合に使う。  
+`APPROVE` は、次工程へ進んでよい場合だけ使う。
+`REJECT` は、実行者が修正して同じ gate を再実行できる場合に使う。
 `ESCALATE` は、仕様判断、権限、外部状態、人間の承認が必要な場合に使う。
 
-## Memory
+## 記録
 
 Linear が memory backend の場合は `$linear-memory` を使い、各 review gate の結果を Linear Comment に記録する。
 
 記録する内容:
 
-- Phase
-- Actor
-- Reviewer
-- Verdict
-- Evidence
-- Required Next Action
-- Residual Risk
+- 工程
+- 実行者
+- レビュー担当
+- 判定
+- 根拠
+- 必要な次アクション
+- 残るリスク
 
-## Stop Conditions
+## 停止条件
 
 次工程へ進める条件:
 
-- 対象 phase の Reviewer が `APPROVE` を返している。
-- `REJECT` の場合は、actor が修正し、同じ phase を再レビューしている。
+- 対象 phase のレビュー担当が `APPROVE` を返している。
+- `REJECT` の場合は、実行者が修正し、同じ phase を再レビューしている。
 - `ESCALATE` の場合は、人間の判断が Linear memory または現在の会話に記録されている。
 
 レビューできない場合は、レビューを省略せず `ESCALATE` として扱う。

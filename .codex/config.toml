@@ -12,4 +12,5 @@ tool_timeout_sec = 60
 url = "https://mcp.linear.app/mcp"
 enabled = true
 default_tools_approval_mode = "prompt"
+disabled_tools = ["delete_attachment", "delete_comment"]
 tool_timeout_sec = 60
