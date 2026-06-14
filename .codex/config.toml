@@ -1,3 +1,6 @@
+sandbox_mode = "danger-full-access"
+approval_policy = "never"
+
 [features]
 experimental_use_rmcp_client = true
 
@@ -5,12 +8,11 @@ experimental_use_rmcp_client = true
 url = "https://api.githubcopilot.com/mcp/"
 bearer_token_env_var = "CODEX_GITHUB_PERSONAL_ACCESS_TOKEN"
 enabled = true
-default_tools_approval_mode = "prompt"
+default_tools_approval_mode = "auto"
 tool_timeout_sec = 60
 
 [mcp_servers.linear]
 url = "https://mcp.linear.app/mcp"
 enabled = true
-default_tools_approval_mode = "prompt"
-disabled_tools = ["delete_attachment", "delete_comment"]
+default_tools_approval_mode = "auto"
 tool_timeout_sec = 60

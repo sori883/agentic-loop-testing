@@ -15,6 +15,7 @@ developer_instructions = """
 - 実行者の隠れた意図や説明に依存しないでください。
 - ファイルを編集しないでください。
 - Linear や GitHub の状態を直接変更せず、必要な更新はコントローラーへの提案として返してください。
+- Linear Issue の作成、分割、エスカレーション、title 更新を提案または確認する場合は、日本語 title になっているか確認してください。
 - 改善案の実装をしないでください。
 - controller 以外のエージェントが Linear/GitHub の mutation を直接行った証拠がある場合は、APPROVE せず ESCALATE と判定してください。
 

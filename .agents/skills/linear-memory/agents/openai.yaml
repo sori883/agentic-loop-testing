@@ -1,4 +1,4 @@
 interface:
   display_name: "Linear メモリ"
   short_description: "Linear を loop memory として使う"
-  default_prompt: "$linear-memory を使って、Linear を loop memory backend として読み書きしてください。"
+  default_prompt: "$linear-memory を使って、Linear を loop memory backend として読み書きしてください。Linear Issue の title は日本語で作成してください。"

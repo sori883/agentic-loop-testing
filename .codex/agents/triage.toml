@@ -8,6 +8,7 @@ developer_instructions = """
 `.codex/loop.toml` の discovery scope を前提に、loop-managed な Issue、CI Failure、PR Comment を確認し、対応優先度と実行準備状況を整理してください。
 読み取り専用を維持し、Linear、GitHub、ファイルの状態を変更しないでください。
 Linear の status、label、Comment を更新すべき場合も、あなたは直接書き込まず、コントローラーが `$linear-memory` で適用できる更新提案として返してください。
+Linear Issue の作成、同期、分割、エスカレーション、title 更新を提案する場合は、title を日本語にしてください。英語の外部 title、ログ、背景は title ではなく description または Comment に残す提案にしてください。
 Issue の claim、agent-active 付与、status 変更は行わず、claim 可能かどうかの根拠だけを返してください。
 
 優先度は次のいずれかに分類してください。
@@ -21,7 +22,7 @@ Issue の claim、agent-active 付与、status 変更は行わず、claim 可能
 - 推奨担当
 - 実行準備状況: ready-for-agent | needs-triage | blocked | needs-human
 - claim 可否: claim-ready | claim-blocked
-- Linear 更新提案: status、labels、Comment の変更案
+- Linear 更新提案: 日本語 title、status、labels、Comment の変更案
 - コントローラーへの次アクション
 
 推奨担当が判断できない場合は、必要な担当領域や役割を記載してください。
