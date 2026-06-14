@@ -124,6 +124,11 @@ allowed_labels_add = [
   "needs-human",
   "blocked",
   "verification-failed",
+  "loop-improvement",
+  "needs-retro",
+  "capability-expansion",
+  "skill-gap",
+  "agent-gap",
   "github-linked",
   "phase-planning",
   "phase-red",
@@ -139,6 +144,11 @@ allowed_labels_remove = [
   "needs-human",
   "blocked",
   "verification-failed",
+  "loop-improvement",
+  "needs-retro",
+  "capability-expansion",
+  "skill-gap",
+  "agent-gap",
   "phase-planning",
   "phase-red",
   "phase-green",
@@ -154,6 +164,47 @@ linear_mutation_tools_allowed_for = ["controller"]
 github_mutation_tools_allowed_for = ["controller"]
 tool_approval_policy = "setup と dry-run では GitHub と Linear の MCP mutation を自動適用してはいけない。live-run では .codex/config.toml の full-access 設定により controller の MCP mutation を自動適用してよい。automation 登録前の手動テストでは、読み取り専用エージェントが mutation tool を要求していないことを確認する。"
 violation_policy = "controller 以外が Linear または GitHub の状態を直接変更した証拠がある場合、その run では Done にせず needs-human としてエスカレーションし、変更内容と再発防止策を Linear Comment に記録する。"
+
+[retrospective]
+enabled = true
+trigger_policy = "PJ の最後、milestone/release/主要 PR 完了前、または人間が振り返りを要求した場合に実行する。通常 loop 中は悪かった点、詰まり、検証不足、自動化余地を Linear Comment または completion_evidence の loop 改善候補に残し、retrospective で集約する。"
+source_scope = "loop-managed Issue と関連 Comment、completion_evidence の loop 改善候補/残るリスク/次のアクション、review gate の REJECT/ESCALATE、verification-failed、needs-human、blocked の履歴を読む。"
+read_policy = "controller は retrospective 実行前に対象 Project、Milestone、期間、または対象 Issue 群を特定し、Linear の最新状態を source of truth として読む。"
+grouping_policy = "同じ原因、同じ改善先、同じ検証不足を持つメモは 1 つの改善 Issue に統合する。重複する提案、英語原文、ログ、関連 Issue は description または Comment に根拠として集約する。"
+issue_creation_policy = "改善が必要な場合は Linear Issue を作成または更新する。title は memory.issue_title_policy に従って日本語にし、labels に loop-managed と loop-improvement を付ける。実行可能なら ready-for-agent、調査や整理が必要なら needs-triage も付ける。"
+autofix_policy = "小さく局所的で検証可能な改善だけ、通常 loop と同じ claim、TDD、review gate、completion_evidence ルールで自律実行してよい。広範な設計変更、破壊的変更、権限/費用/外部契約が絡む変更、受け入れ条件が曖昧な改善は needs-human として残す。"
+capability_expansion_policy = "既存 skill、agent、automation prompt、loop policy では同じ種類の失敗、迷い、手作業、検証不足を解消できない場合、改善手段として新規 skill または新規 agent の作成を許可する。新規 skill は .agents/skills/<skill-name>/SKILL.md と必要最小限の agents/openai.yaml、references/scripts/assets に限定し、skill-creator の原則に従って簡潔に作る。新規 agent は .codex/agents/<agent-name>.toml に限定し、単一責務、最小権限、controller-only mutation 境界を守る。"
+capability_expansion_autofix_policy = "小さく局所的で、外部契約、費用、秘密情報、権限拡大、大量依存追加を伴わない skill/agent 追加または更新は、通常 loop と同じ claim、検証、別エージェント review gate を通したうえで自律実行してよい。既存の権限境界を広げる変更、MCP/tool 権限追加、外部サービス接続、広範な設計変更、責務が曖昧な agent 増加は needs-human として残す。"
+capability_expansion_review_policy = "新規または更新した skill/agent は、TOML/YAML/Markdown 構文確認、必要に応じた quick_validate、既存 policy との整合確認、別エージェントによる phase-reviewer または verifier の APPROVE を Done 前に必須とする。"
+completion_policy = "retrospective は、改善候補なしを Linear Comment に記録するか、改善 Issue の作成/更新と根拠 Comment の記録が終わったら完了とする。作成/更新した改善 Issue は project summary または retrospective Comment から辿れるようにする。"
+labels_add = ["loop-improvement", "needs-retro", "capability-expansion", "skill-gap", "agent-gap"]
+categories = [
+  "prompt-debt",
+  "test-debt",
+  "automation-debt",
+  "skill-gap",
+  "agent-gap",
+  "capability-expansion",
+  "review-gap",
+  "triage-gap",
+  "documentation-gap",
+  "tooling-gap",
+  "process-risk",
+]
+comment_template = """
+## 振り返り
+
+対象:
+読んだ Linear Issue / Comment:
+見つけた悪かった点:
+共通原因:
+作成/更新した改善 Issue:
+作成/更新した skill / agent:
+自律修正してよい範囲:
+needs-human にした判断:
+残るリスク:
+次:
+"""
 
 [automation]
 name = "agentic-loop-daily"
@@ -179,6 +230,9 @@ live-run の場合だけ、.codex/loop.toml で許可された Linear status、l
 読み取り専用エージェントに Linear、GitHub、リポジトリファイルを変更させない。
 実装が必要な場合は $tdd-cycle を使う。
 設計、テスト、実装、リファクタリング、最終検証の各 phase 後に $cross-review-gates を使う。
+作業中に悪かった点、詰まり、検証不足、自動化できる手作業を見つけた場合は、Linear Comment または completion_evidence の loop 改善候補に簡潔に残す。
+PJ の最後、milestone/release/主要 PR 完了前、または人間が振り返りを要求した場合は .codex/loop.toml の [retrospective] に従い、改善候補を集約して日本語 title の Linear 改善 Issue を作成または更新する。
+既存 skill / agent では改善候補を解消できない場合は、.codex/loop.toml の retrospective.capability_expansion_policy に従って、新規 skill または新規 agent の作成を改善手段として扱ってよい。
 完了前に受け入れ/E2E 証跡を確認し、永続化すべき結果を Linear に記録する。
 Done にする前に .codex/loop.toml に従って完了証跡を Linear に書く。
 受け入れ/E2E 検証を skip した、または実行できない場合は、Done にせず needs-human としてエスカレーションする。
@@ -201,6 +255,8 @@ required_fields = [
   "最終検証レビュー",
   "GitHub リンクまたは該当なし",
   "スキップした確認",
+  "loop 改善候補",
+  "能力拡張",
   "残るリスク",
   "次のアクション",
 ]
@@ -220,6 +276,8 @@ done_requires = [
   "残るリスクがない場合も、その旨を記録している。",
   "GitHub branch、commit、PR、CI link が存在する場合は記録している。",
   "GitHub を使わない work item では、GitHub リンク欄に該当なしと理由を記録している。",
+  "loop 改善候補がない場合も、その旨を記録している。",
+  "skill/agent を新規作成または更新した場合は、能力拡張欄に対象、理由、検証、別エージェント review gate の結果を記録している。",
 ]
 comment_template = """
 ## 完了証跡
@@ -238,6 +296,8 @@ Linear Issue:
 最終検証レビュー:
 GitHub リンクまたは該当なし:
 スキップした確認:
+loop 改善候補:
+能力拡張:
 残るリスク:
 次のアクション:
 """

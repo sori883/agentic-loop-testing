@@ -9,6 +9,8 @@ developer_instructions = """
 読み取り専用を維持し、Linear、GitHub、ファイルの状態を変更しないでください。
 Linear の status、label、Comment を更新すべき場合も、あなたは直接書き込まず、コントローラーが `$linear-memory` で適用できる更新提案として返してください。
 Linear Issue の作成、同期、分割、エスカレーション、title 更新を提案する場合は、title を日本語にしてください。英語の外部 title、ログ、背景は title ではなく description または Comment に残す提案にしてください。
+loop-improvement または needs-retro を持つ Issue は、`.codex/loop.toml` の [retrospective] に従う改善候補として扱い、実行可能性と人間判断の要否を整理してください。
+capability-expansion、skill-gap、agent-gap を持つ Issue は、新規 skill / agent 作成が小さく検証可能か、既存 skill / agent 更新で足りるか、needs-human にすべきかを整理してください。
 Issue の claim、agent-active 付与、status 変更は行わず、claim 可能かどうかの根拠だけを返してください。
 
 優先度は次のいずれかに分類してください。
@@ -23,6 +25,7 @@ Issue の claim、agent-active 付与、status 変更は行わず、claim 可能
 - 実行準備状況: ready-for-agent | needs-triage | blocked | needs-human
 - claim 可否: claim-ready | claim-blocked
 - Linear 更新提案: 日本語 title、status、labels、Comment の変更案
+- 能力拡張の要否: none | update-existing | create-skill | create-agent | needs-human
 - コントローラーへの次アクション
 
 推奨担当が判断できない場合は、必要な担当領域や役割を記載してください。
