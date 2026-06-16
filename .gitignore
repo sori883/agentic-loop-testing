@@ -1,2 +1,4 @@
 .DS_Store
-.codex/codex.env
+.claude/.env
+*.local.json
+.serena/
