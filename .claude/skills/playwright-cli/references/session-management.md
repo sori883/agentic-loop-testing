@@ -1,225 +1,225 @@
-# Browser Session Management
+# ブラウザセッション管理
 
-Run multiple isolated browser sessions concurrently with state persistence.
+状態を保持しつつ、複数の分離されたブラウザセッションを同時に実行します。
 
-## Named Browser Sessions
+## 名前付きブラウザセッション
 
-Use `-s` flag to isolate browser contexts:
+`-s` フラグを使ってブラウザコンテキストを分離します:
 
 ```bash
-# Browser 1: Authentication flow
+# ブラウザ1: 認証フロー
 playwright-cli -s=auth open https://app.example.com/login
 
-# Browser 2: Public browsing (separate cookies, storage)
+# ブラウザ2: 公開ブラウジング（cookie やストレージは別管理）
 playwright-cli -s=public open https://example.com
 
-# Commands are isolated by browser session
+# コマンドはブラウザセッションごとに分離される
 playwright-cli -s=auth fill e1 "user@example.com"
 playwright-cli -s=public snapshot
 ```
 
-## Browser Session Isolation Properties
+## ブラウザセッションの分離特性
 
-Each browser session has independent:
-- Cookies
+各ブラウザセッションは以下を独立して持ちます:
+- Cookie
 - LocalStorage / SessionStorage
 - IndexedDB
 - Cache
-- Browsing history
-- Open tabs
+- ブラウジング履歴
+- 開いているタブ
 
-## Browser Session Commands
+## ブラウザセッションコマンド
 
 ```bash
-# List all browser sessions
+# すべてのブラウザセッションを一覧表示
 playwright-cli list
 
-# Stop a browser session (close the browser)
-playwright-cli close                # stop the default browser
-playwright-cli -s=mysession close   # stop a named browser
+# ブラウザセッションを停止する（ブラウザを閉じる）
+playwright-cli close                # デフォルトのブラウザを停止
+playwright-cli -s=mysession close   # 名前付きブラウザを停止
 
-# Stop all browser sessions
+# すべてのブラウザセッションを停止
 playwright-cli close-all
 
-# Forcefully kill all daemon processes (for stale/zombie processes)
+# すべての daemon プロセスを強制終了する（古い／ゾンビプロセス対策）
 playwright-cli kill-all
 
-# Delete browser session user data (profile directory)
-playwright-cli delete-data                # delete default browser data
-playwright-cli -s=mysession delete-data   # delete named browser data
+# ブラウザセッションのユーザーデータ（profile ディレクトリ）を削除
+playwright-cli delete-data                # デフォルトのブラウザデータを削除
+playwright-cli -s=mysession delete-data   # 名前付きブラウザのデータを削除
 ```
 
-## Environment Variable
+## 環境変数
 
-Set a default browser session name via environment variable:
+環境変数でデフォルトのブラウザセッション名を設定します:
 
 ```bash
 export PLAYWRIGHT_CLI_SESSION="mysession"
-playwright-cli open example.com  # Uses "mysession" automatically
+playwright-cli open example.com  # 自動的に "mysession" を使用する
 ```
 
-## Common Patterns
+## よくあるパターン
 
-### Concurrent Scraping
+### 並列スクレイピング
 
 ```bash
 #!/bin/bash
-# Scrape multiple sites concurrently
+# 複数のサイトを並列にスクレイピングする
 
-# Start all browsers
+# すべてのブラウザを起動
 playwright-cli -s=site1 open https://site1.com &
 playwright-cli -s=site2 open https://site2.com &
 playwright-cli -s=site3 open https://site3.com &
 wait
 
-# Take snapshots from each
+# それぞれからスナップショットを取得
 playwright-cli -s=site1 snapshot
 playwright-cli -s=site2 snapshot
 playwright-cli -s=site3 snapshot
 
-# Cleanup
+# クリーンアップ
 playwright-cli close-all
 ```
 
-### A/B Testing Sessions
+### A/B テストセッション
 
 ```bash
-# Test different user experiences
+# 異なるユーザー体験をテストする
 playwright-cli -s=variant-a open "https://app.com?variant=a"
 playwright-cli -s=variant-b open "https://app.com?variant=b"
 
-# Compare
+# 比較する
 playwright-cli -s=variant-a screenshot
 playwright-cli -s=variant-b screenshot
 ```
 
-### Persistent Profile
+### 永続プロファイル
 
-By default, browser profile is kept in memory only. Use `--persistent` flag on `open` to persist the browser profile to disk:
+デフォルトでは、ブラウザの profile はメモリ上にのみ保持されます。`open` に `--persistent` フラグを付けると、ブラウザの profile をディスクに永続化できます:
 
 ```bash
-# Use persistent profile (auto-generated location)
+# 永続プロファイルを使用する（場所は自動生成）
 playwright-cli open https://example.com --persistent
 
-# Use persistent profile with custom directory
+# 永続プロファイルをカスタムディレクトリで使用する
 playwright-cli open https://example.com --profile=/path/to/profile
 ```
 
-## Attaching to a Running Browser
+## 実行中のブラウザへのアタッチ
 
-Use `attach` to connect to a browser that is already running, instead of launching a new one.
+新しいブラウザを起動する代わりに、すでに実行中のブラウザへ接続するには `attach` を使います。
 
-### Attach by channel name
+### チャンネル名でアタッチ
 
-Connect to a running Chrome or Edge instance by its channel name. The browser must have remote debugging enabled — navigate to `chrome://inspect/#remote-debugging` in the target browser and check "Allow remote debugging for this browser instance".
+実行中の Chrome または Edge インスタンスにチャンネル名で接続します。対象のブラウザでリモートデバッグが有効になっている必要があります。対象ブラウザで `chrome://inspect/#remote-debugging` を開き、"Allow remote debugging for this browser instance" をチェックしてください。
 
 ```bash
-# Attach to Chrome
+# Chrome にアタッチ
 playwright-cli attach --cdp=chrome
 
-# Attach to Chrome Canary
+# Chrome Canary にアタッチ
 playwright-cli attach --cdp=chrome-canary
 
-# Attach to Microsoft Edge
+# Microsoft Edge にアタッチ
 playwright-cli attach --cdp=msedge
 
-# Attach to Edge Dev
+# Edge Dev にアタッチ
 playwright-cli attach --cdp=msedge-dev
 ```
 
-Supported channels: `chrome`, `chrome-beta`, `chrome-dev`, `chrome-canary`, `msedge`, `msedge-beta`, `msedge-dev`, `msedge-canary`.
+サポートされているチャンネル: `chrome`, `chrome-beta`, `chrome-dev`, `chrome-canary`, `msedge`, `msedge-beta`, `msedge-dev`, `msedge-canary`。
 
-When `--session` is not provided, the session is named after the channel (e.g. `--cdp=msedge` creates a session called `msedge`), so parallel attaches to Chrome and Edge don't collide on `default`. Pass `--session=<name>` to override.
+`--session` を指定しない場合、セッションはチャンネル名に基づいて命名されます（例: `--cdp=msedge` は `msedge` という名前のセッションを作成）。これにより、Chrome と Edge への並列アタッチが `default` で衝突しません。上書きするには `--session=<name>` を渡してください。
 
-### Attach via CDP endpoint
+### CDP エンドポイント経由でアタッチ
 
-Connect to a browser that exposes a Chrome DevTools Protocol endpoint:
+Chrome DevTools Protocol エンドポイントを公開しているブラウザに接続します:
 
 ```bash
 playwright-cli attach --cdp=http://localhost:9222
 ```
 
-### Attach via browser extension
+### ブラウザ拡張機能経由でアタッチ
 
-Connect to a browser with the Playwright extension installed:
+Playwright 拡張機能がインストールされたブラウザに接続します:
 
 ```bash
 playwright-cli attach --extension
 ```
 
-### Detach
+### デタッチ
 
-Tear down an attached session without affecting the external browser:
+外部ブラウザに影響を与えずに、アタッチしたセッションを破棄します:
 
 ```bash
-# Detach the default attached session
+# デフォルトのアタッチ済みセッションをデタッチ
 playwright-cli detach
 
-# Detach a specific attached session
+# 特定のアタッチ済みセッションをデタッチ
 playwright-cli -s=msedge detach
 ```
 
-`detach` only works on sessions created via `attach`. For sessions created via `open`, use `close`.
+`detach` は `attach` で作成したセッションに対してのみ機能します。`open` で作成したセッションには `close` を使ってください。
 
-## Default Browser Session
+## デフォルトのブラウザセッション
 
-When `-s` is omitted, commands use the default browser session:
+`-s` を省略すると、コマンドはデフォルトのブラウザセッションを使用します:
 
 ```bash
-# These use the same default browser session
+# これらは同じデフォルトのブラウザセッションを使用する
 playwright-cli open https://example.com
 playwright-cli snapshot
-playwright-cli close  # Stops default browser
+playwright-cli close  # デフォルトのブラウザを停止する
 ```
 
-## Browser Session Configuration
+## ブラウザセッションの設定
 
-Configure a browser session with specific settings when opening:
+開くときに、特定の設定でブラウザセッションを構成します:
 
 ```bash
-# Open with config file
+# config ファイルを指定して開く
 playwright-cli open https://example.com --config=.playwright/my-cli.json
 
-# Open with specific browser
+# 特定のブラウザで開く
 playwright-cli open https://example.com --browser=firefox
 
-# Open in headed mode
+# headed モードで開く
 playwright-cli open https://example.com --headed
 
-# Open with persistent profile
+# 永続プロファイルで開く
 playwright-cli open https://example.com --persistent
 ```
 
-## Best Practices
+## ベストプラクティス
 
-### 1. Name Browser Sessions Semantically
+### 1. ブラウザセッションには意味のある名前を付ける
 
 ```bash
-# GOOD: Clear purpose
+# GOOD: 目的が明確
 playwright-cli -s=github-auth open https://github.com
 playwright-cli -s=docs-scrape open https://docs.example.com
 
-# AVOID: Generic names
+# AVOID: 汎用的な名前
 playwright-cli -s=s1 open https://github.com
 ```
 
-### 2. Always Clean Up
+### 2. 必ずクリーンアップする
 
 ```bash
-# Stop browsers when done
+# 終わったらブラウザを停止する
 playwright-cli -s=auth close
 playwright-cli -s=scrape close
 
-# Or stop all at once
+# あるいは一括ですべて停止する
 playwright-cli close-all
 
-# If browsers become unresponsive or zombie processes remain
+# ブラウザが応答しなくなったり、ゾンビプロセスが残ったりした場合
 playwright-cli kill-all
 ```
 
-### 3. Delete Stale Browser Data
+### 3. 古いブラウザデータを削除する
 
 ```bash
-# Remove old browser data to free disk space
+# 古いブラウザデータを削除してディスク容量を解放する
 playwright-cli -s=oldsession delete-data
 ```

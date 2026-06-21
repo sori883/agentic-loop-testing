@@ -1,131 +1,131 @@
-# Test Generation
+# テスト生成
 
-Generate Playwright test code automatically as you interact with the browser.
+ブラウザを操作しながら、Playwright のテストコードを自動的に生成します。
 
-## How It Works
+## 仕組み
 
-Every action you perform with `playwright-cli` generates corresponding Playwright TypeScript code.
-This code appears in the output and can be copied directly into your test files.
+`playwright-cli` で実行するすべてのアクションは、対応する Playwright の TypeScript コードを生成します。
+このコードは出力に表示され、そのままテストファイルにコピーできます。
 
-## Example Workflow
+## ワークフロー例
 
 ```bash
-# Start a session
+# セッションを開始する
 playwright-cli open https://example.com/login
 
-# Take a snapshot to see elements
+# スナップショットを取得して要素を確認する
 playwright-cli snapshot
-# Output shows: e1 [textbox "Email"], e2 [textbox "Password"], e3 [button "Sign In"]
+# 出力例: e1 [textbox "Email"], e2 [textbox "Password"], e3 [button "Sign In"]
 
-# Fill form fields - generates code automatically
+# フォームフィールドを入力する - コードが自動的に生成される
 playwright-cli fill e1 "user@example.com"
-# Ran Playwright code:
+# 実行された Playwright コード:
 # await page.getByRole('textbox', { name: 'Email' }).fill('user@example.com');
 
 playwright-cli fill e2 "password123"
-# Ran Playwright code:
+# 実行された Playwright コード:
 # await page.getByRole('textbox', { name: 'Password' }).fill('password123');
 
 playwright-cli click e3
-# Ran Playwright code:
+# 実行された Playwright コード:
 # await page.getByRole('button', { name: 'Sign In' }).click();
 ```
 
-## Building a Test File
+## テストファイルの構築
 
-Collect the generated code into a Playwright test:
+生成されたコードを Playwright のテストにまとめます:
 
 ```typescript
 import { test, expect } from '@playwright/test';
 
 test('login flow', async ({ page }) => {
-  // Generated code from playwright-cli session:
+  // playwright-cli セッションから生成されたコード:
   await page.goto('https://example.com/login');
   await page.getByRole('textbox', { name: 'Email' }).fill('user@example.com');
   await page.getByRole('textbox', { name: 'Password' }).fill('password123');
   await page.getByRole('button', { name: 'Sign In' }).click();
 
-  // Add assertions
+  // アサーションを追加する
   await expect(page).toHaveURL(/.*dashboard/);
 });
 ```
 
-## Best Practices
+## ベストプラクティス
 
-### 1. Use Semantic Locators
+### 1. セマンティックなロケーターを使う
 
-The generated code uses role-based locators when possible, which are more resilient:
+生成されるコードは可能な限り role ベースのロケーターを使用し、これはより堅牢です:
 
 ```typescript
-// Generated (good - semantic)
+// 生成されたもの（良い - セマンティック）
 await page.getByRole('button', { name: 'Submit' }).click();
 
-// Avoid (fragile - CSS selectors)
+// 避けるべきもの（脆い - CSS セレクター）
 await page.locator('#submit-btn').click();
 ```
 
-### 2. Explore Before Recording
+### 2. 記録する前に探索する
 
-Take snapshots to understand the page structure before recording actions:
+アクションを記録する前に、スナップショットを取得してページ構造を把握します:
 
 ```bash
 playwright-cli open https://example.com
 playwright-cli snapshot
-# Review the element structure
+# 要素の構造を確認する
 playwright-cli click e5
 ```
 
-### 3. Add Assertions Manually
+### 3. アサーションは手動で追加する
 
-Generated code captures actions but not assertions. Add expectations in your test using one of the recommended matchers:
+生成されるコードはアクションを捕捉しますが、アサーションは捕捉しません。推奨されるマッチャーのいずれかを使って、テストに期待値を追加してください:
 
-- `toBeVisible()` — element is rendered and visible
-- `toHaveText(text)` — element text content matches
-- `toHaveValue(value) / toBeEmpty()` — input/select value matches
-- `toBeChecked() / toBeUnchecked()` — checkbox state matches
-- `toMatchAriaSnapshot(snapshot)` — page (or locator) matches a partial accessibility snapshot
+- `toBeVisible()` — 要素がレンダリングされ、表示されている
+- `toHaveText(text)` — 要素のテキスト内容が一致する
+- `toHaveValue(value) / toBeEmpty()` — input/select の値が一致する
+- `toBeChecked() / toBeUnchecked()` — チェックボックスの状態が一致する
+- `toMatchAriaSnapshot(snapshot)` — ページ（またはロケーター）が部分的なアクセシビリティスナップショットに一致する
 
-Use `playwright-cli generate-locator <target>` to produce the locator expression for the assertion, and the snapshot/eval commands to capture the expected value.
+アサーション用のロケーター式を生成するには `playwright-cli generate-locator <target>` を使い、期待値を捕捉するには snapshot/eval コマンドを使います。
 
-When asserting text content, make sure that generated locator does not contain text from the element itself. `getByTestId()` or `getByLabel()` usually work well with asserting text. When locator is text-based, prefer `toBeVisible()` instead.
+テキスト内容をアサートする場合、生成されるロケーターに要素自体のテキストが含まれないようにしてください。`getByTestId()` や `getByLabel()` はテキストのアサーションでうまく機能することが多いです。ロケーターがテキストベースの場合は、代わりに `toBeVisible()` を使うことを推奨します。
 
-Snapshot to be matched does not have to contain all the information - only capture what's necessary for the assertion. You can use regular expressions for unstable values.
+一致させるスナップショットはすべての情報を含む必要はありません。アサーションに必要なものだけを捕捉してください。不安定な値には正規表現を使用できます。
 
 ```bash
-# Get a stable locator for an element ref to use in the assertion
+# アサーションで使う、要素 ref に対する安定したロケーターを取得する
 playwright-cli --raw generate-locator e5
 # getByRole('button', { name: 'Submit' })
 
-# Capture expected text content for toHaveText
+# toHaveText 用に期待するテキスト内容を捕捉する
 playwright-cli --raw eval "el => el.textContent" e5
 
-# Capture expected input value for toHaveValue/toBeEmpty
+# toHaveValue/toBeEmpty 用に期待する input の値を捕捉する
 playwright-cli --raw eval "el => el.value" e5
 
-# Capture expected aria snapshot for toMatchAriaSnapshot/toBeChecked
-# (whole page, or use a ref to scope to a region)
+# toMatchAriaSnapshot/toBeChecked 用に期待する aria スナップショットを捕捉する
+# （ページ全体、または ref を使って特定の領域にスコープする）
 playwright-cli --raw snapshot
 playwright-cli --raw snapshot e5
 ```
 
 ```typescript
-// Generated action
+// 生成されたアクション
 await page.getByRole('button', { name: 'Submit' }).click();
 
-// Manual assertions using the outputs above:
+// 上記の出力を使った手動のアサーション:
 await expect(page.getByRole('alert', { name: 'Success' })).toBeVisible();
 await expect(page.getByTestId('main-header')).toHaveText('Welcome, user');
 await expect(page.getByRole('textbox', { name: 'Email' })).toHaveValue('user@example.com');
 await expect(page.getByRole('checkbox', { name: 'Enable notifications' })).toBeChecked();
 
-// toMatchAriaSnapshot on the whole page, finds a matching region
+// ページ全体に対する toMatchAriaSnapshot は、一致する領域を見つける
 await expect(page).toMatchAriaSnapshot(`
   - heading "Welcome, user"
   - link /\\d+ new messages?/
   - button "Sign out"
 `);
 
-// toMatchAriaSnapshot scoped to a region
+// 特定の領域にスコープした toMatchAriaSnapshot
 await expect(page.getByRole('navigation')).toMatchAriaSnapshot(`
   - link "Home"
   - link /\\d+ new messages?/

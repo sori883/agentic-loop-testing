@@ -1,23 +1,23 @@
-# Inspecting Element Attributes
+# 要素の属性を調べる
 
-When the snapshot doesn't show an element's `id`, `class`, `data-*` attributes, or other DOM properties, use `eval` to inspect them.
+snapshot に要素の `id`、`class`、`data-*` 属性、その他の DOM プロパティが表示されない場合は、`eval` を使ってそれらを調べます。
 
-## Examples
+## 例
 
 ```bash
 playwright-cli snapshot
-# snapshot shows a button as e7 but doesn't reveal its id or data attributes
+# snapshot ではボタンが e7 として表示されるが、その id や data 属性は表示されない
 
-# get the element's id
+# 要素の id を取得する
 playwright-cli eval "el => el.id" e7
 
-# get all CSS classes
+# すべての CSS クラスを取得する
 playwright-cli eval "el => el.className" e7
 
-# get a specific attribute
+# 特定の属性を取得する
 playwright-cli eval "el => el.getAttribute('data-testid')" e7
 playwright-cli eval "el => el.getAttribute('aria-label')" e7
 
-# get a computed style property
+# 計算されたスタイルプロパティを取得する
 playwright-cli eval "el => getComputedStyle(el).display" e7
 ```

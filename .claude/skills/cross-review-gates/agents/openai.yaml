@@ -1,4 +1,0 @@
-interface:
-  display_name: "クロスレビューゲート"
-  short_description: "各工程後に別エージェントで独立クロスレビューを必ず実行する"
-  default_prompt: "$cross-review-gates を使って、各工程後に担当エージェントとは別エージェントでクロスレビューしてください。"

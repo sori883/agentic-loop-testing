@@ -1,51 +1,51 @@
-# Running Custom Playwright Code
+# カスタム Playwright コードの実行
 
-Use `run-code` to execute arbitrary Playwright code for advanced scenarios not covered by CLI commands.
+CLI コマンドではカバーされない高度なシナリオに対して、任意の Playwright コードを実行するには `run-code` を使用します。
 
-## Syntax
+## 構文
 
 ```bash
 playwright-cli run-code "async page => {
-  // Your Playwright code here
-  // Access page.context() for browser context operations
+  // ここに Playwright コードを記述
+  // ブラウザコンテキストの操作には page.context() を使用
 }"
 ```
 
-You can also load the function from a file:
+関数をファイルから読み込むこともできます:
 
 ```bash
 playwright-cli run-code --filename=./my-script.js
 ```
 
 
-The code must be a single function expression, it is wrapped in `(...)` and evaluated.
-import/export/require syntax is not supported.
+コードは単一の関数式である必要があり、`(...)` で囲まれて評価されます。
+import/export/require 構文はサポートされていません。
 
-## Geolocation
+## 位置情報 (Geolocation)
 
 ```bash
-# Grant geolocation permission and set location
+# 位置情報の権限を付与して位置を設定
 playwright-cli run-code "async page => {
   await page.context().grantPermissions(['geolocation']);
   await page.context().setGeolocation({ latitude: 37.7749, longitude: -122.4194 });
 }"
 
-# Set location to London
+# 位置をロンドンに設定
 playwright-cli run-code "async page => {
   await page.context().grantPermissions(['geolocation']);
   await page.context().setGeolocation({ latitude: 51.5074, longitude: -0.1278 });
 }"
 
-# Clear geolocation override
+# 位置情報のオーバーライドをクリア
 playwright-cli run-code "async page => {
   await page.context().clearPermissions();
 }"
 ```
 
-## Permissions
+## 権限 (Permissions)
 
 ```bash
-# Grant multiple permissions
+# 複数の権限を付与
 playwright-cli run-code "async page => {
   await page.context().grantPermissions([
     'geolocation',
@@ -55,7 +55,7 @@ playwright-cli run-code "async page => {
   ]);
 }"
 
-# Grant permissions for specific origin
+# 特定のオリジンに対して権限を付与
 playwright-cli run-code "async page => {
   await page.context().grantPermissions(['clipboard-read'], {
     origin: 'https://example.com'
@@ -63,74 +63,74 @@ playwright-cli run-code "async page => {
 }"
 ```
 
-## Media Emulation
+## メディアエミュレーション (Media Emulation)
 
 ```bash
-# Emulate dark color scheme
+# ダークカラースキームをエミュレート
 playwright-cli run-code "async page => {
   await page.emulateMedia({ colorScheme: 'dark' });
 }"
 
-# Emulate light color scheme
+# ライトカラースキームをエミュレート
 playwright-cli run-code "async page => {
   await page.emulateMedia({ colorScheme: 'light' });
 }"
 
-# Emulate reduced motion
+# モーション軽減をエミュレート
 playwright-cli run-code "async page => {
   await page.emulateMedia({ reducedMotion: 'reduce' });
 }"
 
-# Emulate print media
+# 印刷メディアをエミュレート
 playwright-cli run-code "async page => {
   await page.emulateMedia({ media: 'print' });
 }"
 ```
 
-## Wait Strategies
+## 待機戦略 (Wait Strategies)
 
 ```bash
-# Wait for network idle
+# ネットワークアイドルを待機
 playwright-cli run-code "async page => {
   await page.waitForLoadState('networkidle');
 }"
 
-# Wait for specific element
+# 特定の要素を待機
 playwright-cli run-code "async page => {
   await page.locator('.loading').waitFor({ state: 'hidden' });
 }"
 
-# Wait for function to return true
+# 関数が true を返すまで待機
 playwright-cli run-code "async page => {
   await page.waitForFunction(() => window.appReady === true);
 }"
 
-# Wait with timeout
+# タイムアウト付きで待機
 playwright-cli run-code "async page => {
   await page.locator('.result').waitFor({ timeout: 10000 });
 }"
 ```
 
-## Frames and Iframes
+## フレームと iframe (Frames and Iframes)
 
 ```bash
-# Work with iframe
+# iframe を操作
 playwright-cli run-code "async page => {
   const frame = page.locator('iframe#my-iframe').contentFrame();
   await frame.locator('button').click();
 }"
 
-# Get all frames
+# すべてのフレームを取得
 playwright-cli run-code "async page => {
   const frames = page.frames();
   return frames.map(f => f.url());
 }"
 ```
 
-## File Downloads
+## ファイルのダウンロード (File Downloads)
 
 ```bash
-# Handle file download
+# ファイルのダウンロードを処理
 playwright-cli run-code "async page => {
   const downloadPromise = page.waitForEvent('download');
   await page.getByRole('link', { name: 'Download' }).click();
@@ -140,49 +140,49 @@ playwright-cli run-code "async page => {
 }"
 ```
 
-## Clipboard
+## クリップボード (Clipboard)
 
 ```bash
-# Read clipboard (requires permission)
+# クリップボードを読み取る（権限が必要）
 playwright-cli run-code "async page => {
   await page.context().grantPermissions(['clipboard-read']);
   return await page.evaluate(() => navigator.clipboard.readText());
 }"
 
-# Write to clipboard
+# クリップボードに書き込む
 playwright-cli run-code "async page => {
   await page.evaluate(text => navigator.clipboard.writeText(text), 'Hello clipboard!');
 }"
 ```
 
-## Page Information
+## ページ情報 (Page Information)
 
 ```bash
-# Get page title
+# ページタイトルを取得
 playwright-cli run-code "async page => {
   return await page.title();
 }"
 
-# Get current URL
+# 現在の URL を取得
 playwright-cli run-code "async page => {
   return page.url();
 }"
 
-# Get page content
+# ページコンテンツを取得
 playwright-cli run-code "async page => {
   return await page.content();
 }"
 
-# Get viewport size
+# ビューポートサイズを取得
 playwright-cli run-code "async page => {
   return page.viewportSize();
 }"
 ```
 
-## JavaScript Execution
+## JavaScript の実行 (JavaScript Execution)
 
 ```bash
-# Execute JavaScript and return result
+# JavaScript を実行して結果を返す
 playwright-cli run-code "async page => {
   return await page.evaluate(() => {
     return {
@@ -193,17 +193,17 @@ playwright-cli run-code "async page => {
   });
 }"
 
-# Pass arguments to evaluate
+# evaluate に引数を渡す
 playwright-cli run-code "async page => {
   const multiplier = 5;
   return await page.evaluate(m => document.querySelectorAll('li').length * m, multiplier);
 }"
 ```
 
-## Error Handling
+## エラーハンドリング (Error Handling)
 
 ```bash
-# Try-catch in run-code
+# run-code 内での try-catch
 playwright-cli run-code "async page => {
   try {
     await page.getByRole('button', { name: 'Submit' }).click({ timeout: 1000 });
@@ -214,10 +214,10 @@ playwright-cli run-code "async page => {
 }"
 ```
 
-## Complex Workflows
+## 複雑なワークフロー (Complex Workflows)
 
 ```bash
-# Login and save state
+# ログインして状態を保存
 playwright-cli run-code "async page => {
   await page.goto('https://example.com/login');
   await page.getByRole('textbox', { name: 'Email' }).fill('user@example.com');
@@ -228,7 +228,7 @@ playwright-cli run-code "async page => {
   return 'Login successful';
 }"
 
-# Scrape data from multiple pages
+# 複数ページからデータをスクレイピング
 playwright-cli run-code "async page => {
   const results = [];
   for (let i = 1; i <= 3; i++) {

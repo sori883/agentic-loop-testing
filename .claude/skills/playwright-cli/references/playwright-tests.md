@@ -1,39 +1,39 @@
-# Running Playwright Tests
+# Playwright テストの実行
 
-To run Playwright tests, use the `npx playwright test` command, or a package manager script. To avoid opening the interactive html report, use `PLAYWRIGHT_HTML_OPEN=never` environment variable.
+Playwright テストを実行するには、`npx playwright test` コマンド、またはパッケージマネージャーのスクリプトを使用します。インタラクティブな html レポートが開かないようにするには、`PLAYWRIGHT_HTML_OPEN=never` 環境変数を使用してください。
 
 ```bash
-# Run all tests
+# すべてのテストを実行
 PLAYWRIGHT_HTML_OPEN=never npx playwright test
 
-# Run all tests through a custom npm script
+# カスタム npm スクリプト経由ですべてのテストを実行
 PLAYWRIGHT_HTML_OPEN=never npm run special-test-command
 ```
 
-# Debugging Playwright Tests
+# Playwright テストのデバッグ
 
-To debug a failing Playwright test, run it with `--debug=cli` option. This command will pause the test at the start and print the debugging instructions.
+失敗している Playwright テストをデバッグするには、`--debug=cli` オプションを付けて実行します。このコマンドはテストを開始時に一時停止し、デバッグ手順を出力します。
 
-**IMPORTANT**: run the command in the background and check the output until "Debugging Instructions" is printed. Make sure to stop the command after you have finished.
+**重要**: コマンドはバックグラウンドで実行し、"Debugging Instructions" が出力されるまで出力を確認してください。作業が完了したら必ずコマンドを停止してください。
 
-Once instructions containing a session name are printed, use `playwright-cli` to attach the session and explore the page.
+セッション名を含む手順が出力されたら、`playwright-cli` を使ってそのセッションにアタッチし、ページを探索します。
 
 ```bash
-# Run the test
+# テストを実行
 PLAYWRIGHT_HTML_OPEN=never npx playwright test --debug=cli
 # ...
-# ... debugging instructions for "tw-abcdef" session ...
+# ... "tw-abcdef" セッションのデバッグ手順 ...
 # ...
 
-# Attach to the test
+# テストにアタッチ
 playwright-cli attach tw-abcdef
 ```
 
-Keep the test running in the background while you explore and look for a fix.
-The test is paused at the start, so you should step over or pause at a particular location
-where the problem is most likely to be.
+探索して修正方法を探している間、テストはバックグラウンドで実行し続けてください。
+テストは開始時に一時停止しているため、問題が発生している可能性が最も高い箇所で
+ステップオーバーするか、一時停止するとよいでしょう。
 
-Every action you perform with `playwright-cli` generates corresponding Playwright TypeScript code.
-This code appears in the output and can be copied directly into the test. Most of the time, a specific locator or an expectation should be updated, but it could also be a bug in the app. Use your judgement.
+`playwright-cli` で実行するすべてのアクションは、対応する Playwright の TypeScript コードを生成します。
+このコードは出力に表示され、テストに直接コピーできます。ほとんどの場合は特定の locator や expectation を更新することになりますが、アプリ側のバグである可能性もあります。状況に応じて判断してください。
 
-After fixing the test, stop the background test run. Rerun to check that test passes.
+テストを修正したら、バックグラウンドのテスト実行を停止します。再実行してテストが通ることを確認してください。

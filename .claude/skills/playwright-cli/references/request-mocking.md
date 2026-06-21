@@ -1,26 +1,26 @@
 # Request Mocking
 
-Intercept, mock, modify, and block network requests.
+ネットワークリクエストの傍受、モック、変更、ブロックを行います。
 
 ## CLI Route Commands
 
 ```bash
-# Mock with custom status
+# カスタムステータスでモック
 playwright-cli route "**/*.jpg" --status=404
 
-# Mock with JSON body
+# JSON ボディでモック
 playwright-cli route "**/api/users" --body='[{"id":1,"name":"Alice"}]' --content-type=application/json
 
-# Mock with custom headers
+# カスタムヘッダーでモック
 playwright-cli route "**/api/data" --body='{"ok":true}' --header="X-Custom: value"
 
-# Remove headers from requests
+# リクエストからヘッダーを削除
 playwright-cli route "**/*" --remove-header=cookie,authorization
 
-# List active routes
+# 有効なルートを一覧表示
 playwright-cli route-list
 
-# Remove a route or all routes
+# 特定のルートまたはすべてのルートを削除
 playwright-cli unroute "**/*.jpg"
 playwright-cli unroute
 ```
@@ -28,15 +28,15 @@ playwright-cli unroute
 ## URL Patterns
 
 ```
-**/api/users           - Exact path match
-**/api/*/details       - Wildcard in path
-**/*.{png,jpg,jpeg}    - Match file extensions
-**/search?q=*          - Match query parameters
+**/api/users           - パスの完全一致
+**/api/*/details       - パス中のワイルドカード
+**/*.{png,jpg,jpeg}    - ファイル拡張子のマッチ
+**/search?q=*          - クエリパラメータのマッチ
 ```
 
 ## Advanced Mocking with run-code
 
-For conditional responses, request body inspection, response modification, or delays:
+条件付きレスポンス、リクエストボディの検査、レスポンスの変更、遅延を行う場合:
 
 ### Conditional Response Based on Request
 
@@ -53,7 +53,7 @@ playwright-cli run-code "async page => {
 }"
 ```
 
-### Modify Real Response
+### 実際のレスポンスを変更
 
 ```bash
 playwright-cli run-code "async page => {
@@ -66,16 +66,16 @@ playwright-cli run-code "async page => {
 }"
 ```
 
-### Simulate Network Failures
+### ネットワーク障害をシミュレート
 
 ```bash
 playwright-cli run-code "async page => {
   await page.route('**/api/offline', route => route.abort('internetdisconnected'));
 }"
-# Options: connectionrefused, timedout, connectionreset, internetdisconnected
+# オプション: connectionrefused, timedout, connectionreset, internetdisconnected
 ```
 
-### Delayed Response
+### 遅延レスポンス
 
 ```bash
 playwright-cli run-code "async page => {

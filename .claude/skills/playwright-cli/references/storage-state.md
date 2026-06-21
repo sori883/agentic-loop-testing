@@ -1,34 +1,34 @@
-# Storage Management
+# ストレージ管理
 
-Manage cookies, localStorage, sessionStorage, and browser storage state.
+cookie、localStorage、sessionStorage、およびブラウザのストレージ状態を管理します。
 
-## Storage State
+## ストレージ状態 (Storage State)
 
-Save and restore complete browser state including cookies and storage.
+cookie とストレージを含むブラウザの完全な状態を保存・復元します。
 
-### Save Storage State
+### ストレージ状態を保存する
 
 ```bash
-# Save to auto-generated filename (storage-state-{timestamp}.json)
+# 自動生成されるファイル名で保存する (storage-state-{timestamp}.json)
 playwright-cli state-save
 
-# Save to specific filename
+# 指定したファイル名で保存する
 playwright-cli state-save my-auth-state.json
 ```
 
-### Restore Storage State
+### ストレージ状態を復元する
 
 ```bash
-# Load storage state from file
+# ファイルからストレージ状態を読み込む
 playwright-cli state-load my-auth-state.json
 
-# Reload page to apply cookies
+# cookie を反映させるためページを再読み込みする
 playwright-cli open https://example.com
 ```
 
-### Storage State File Format
+### ストレージ状態ファイルのフォーマット
 
-The saved file contains:
+保存されるファイルには以下が含まれます:
 
 ```json
 {
@@ -56,60 +56,60 @@ The saved file contains:
 }
 ```
 
-## Cookies
+## Cookie
 
-### List All Cookies
+### すべての cookie を一覧表示する
 
 ```bash
 playwright-cli cookie-list
 ```
 
-### Filter Cookies by Domain
+### ドメインで cookie をフィルタする
 
 ```bash
 playwright-cli cookie-list --domain=example.com
 ```
 
-### Filter Cookies by Path
+### パスで cookie をフィルタする
 
 ```bash
 playwright-cli cookie-list --path=/api
 ```
 
-### Get Specific Cookie
+### 特定の cookie を取得する
 
 ```bash
 playwright-cli cookie-get session_id
 ```
 
-### Set a Cookie
+### cookie を設定する
 
 ```bash
-# Basic cookie
+# 基本的な cookie
 playwright-cli cookie-set session abc123
 
-# Cookie with options
+# オプション付きの cookie
 playwright-cli cookie-set session abc123 --domain=example.com --path=/ --httpOnly --secure --sameSite=Lax
 
-# Cookie with expiration (Unix timestamp)
+# 有効期限付きの cookie (Unix タイムスタンプ)
 playwright-cli cookie-set remember_me token123 --expires=1735689600
 ```
 
-### Delete a Cookie
+### cookie を削除する
 
 ```bash
 playwright-cli cookie-delete session_id
 ```
 
-### Clear All Cookies
+### すべての cookie をクリアする
 
 ```bash
 playwright-cli cookie-clear
 ```
 
-### Advanced: Multiple Cookies or Custom Options
+### 応用: 複数の cookie やカスタムオプション
 
-For complex scenarios like adding multiple cookies at once, use `run-code`:
+一度に複数の cookie を追加するような複雑なシナリオでは `run-code` を使用します:
 
 ```bash
 playwright-cli run-code "async page => {
@@ -122,45 +122,45 @@ playwright-cli run-code "async page => {
 
 ## Local Storage
 
-### List All localStorage Items
+### すべての localStorage 項目を一覧表示する
 
 ```bash
 playwright-cli localstorage-list
 ```
 
-### Get Single Value
+### 単一の値を取得する
 
 ```bash
 playwright-cli localstorage-get token
 ```
 
-### Set Value
+### 値を設定する
 
 ```bash
 playwright-cli localstorage-set theme dark
 ```
 
-### Set JSON Value
+### JSON 値を設定する
 
 ```bash
 playwright-cli localstorage-set user_settings '{"theme":"dark","language":"en"}'
 ```
 
-### Delete Single Item
+### 単一の項目を削除する
 
 ```bash
 playwright-cli localstorage-delete token
 ```
 
-### Clear All localStorage
+### すべての localStorage をクリアする
 
 ```bash
 playwright-cli localstorage-clear
 ```
 
-### Advanced: Multiple Operations
+### 応用: 複数の操作
 
-For complex scenarios like setting multiple values at once, use `run-code`:
+一度に複数の値を設定するような複雑なシナリオでは `run-code` を使用します:
 
 ```bash
 playwright-cli run-code "async page => {
@@ -174,31 +174,31 @@ playwright-cli run-code "async page => {
 
 ## Session Storage
 
-### List All sessionStorage Items
+### すべての sessionStorage 項目を一覧表示する
 
 ```bash
 playwright-cli sessionstorage-list
 ```
 
-### Get Single Value
+### 単一の値を取得する
 
 ```bash
 playwright-cli sessionstorage-get form_data
 ```
 
-### Set Value
+### 値を設定する
 
 ```bash
 playwright-cli sessionstorage-set step 3
 ```
 
-### Delete Single Item
+### 単一の項目を削除する
 
 ```bash
 playwright-cli sessionstorage-delete step
 ```
 
-### Clear sessionStorage
+### sessionStorage をクリアする
 
 ```bash
 playwright-cli sessionstorage-clear
@@ -206,7 +206,7 @@ playwright-cli sessionstorage-clear
 
 ## IndexedDB
 
-### List Databases
+### データベースを一覧表示する
 
 ```bash
 playwright-cli run-code "async page => {
@@ -217,7 +217,7 @@ playwright-cli run-code "async page => {
 }"
 ```
 
-### Delete Database
+### データベースを削除する
 
 ```bash
 playwright-cli run-code "async page => {
@@ -227,49 +227,49 @@ playwright-cli run-code "async page => {
 }"
 ```
 
-## Common Patterns
+## よくあるパターン
 
-### Authentication State Reuse
+### 認証状態の再利用
 
 ```bash
-# Step 1: Login and save state
+# ステップ 1: ログインして状態を保存する
 playwright-cli open https://app.example.com/login
 playwright-cli snapshot
 playwright-cli fill e1 "user@example.com"
 playwright-cli fill e2 "password123"
 playwright-cli click e3
 
-# Save the authenticated state
+# 認証済みの状態を保存する
 playwright-cli state-save auth.json
 
-# Step 2: Later, restore state and skip login
+# ステップ 2: 後で状態を復元してログインをスキップする
 playwright-cli state-load auth.json
 playwright-cli open https://app.example.com/dashboard
-# Already logged in!
+# すでにログイン済み!
 ```
 
-### Save and Restore Roundtrip
+### 保存と復元のラウンドトリップ
 
 ```bash
-# Set up authentication state
+# 認証状態を設定する
 playwright-cli open https://example.com
 playwright-cli eval "() => { document.cookie = 'session=abc123'; localStorage.setItem('user', 'john'); }"
 
-# Save state to file
+# 状態をファイルに保存する
 playwright-cli state-save my-session.json
 
-# ... later, in a new session ...
+# ... 後で、新しいセッションで ...
 
-# Restore state
+# 状態を復元する
 playwright-cli state-load my-session.json
 playwright-cli open https://example.com
-# Cookies and localStorage are restored!
+# cookie と localStorage が復元される!
 ```
 
-## Security Notes
+## セキュリティに関する注意
 
-- Never commit storage state files containing auth tokens
-- Add `*.auth-state.json` to `.gitignore`
-- Delete state files after automation completes
-- Use environment variables for sensitive data
-- By default, sessions run in-memory mode which is safer for sensitive operations
+- 認証トークンを含むストレージ状態ファイルは絶対にコミットしないこと
+- `.gitignore` に `*.auth-state.json` を追加すること
+- 自動化が完了したら状態ファイルを削除すること
+- 機密データには環境変数を使用すること
+- デフォルトでは、セッションはインメモリモードで実行され、機密性の高い操作にとってより安全です

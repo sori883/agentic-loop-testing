@@ -1,63 +1,63 @@
 # Tracing
 
-Capture detailed execution traces for debugging and analysis. Traces include DOM snapshots, screenshots, network activity, and console logs.
+デバッグと分析のために、詳細な実行トレースを取得します。トレースには DOM スナップショット、スクリーンショット、ネットワークアクティビティ、コンソールログが含まれます。
 
 ## Basic Usage
 
 ```bash
-# Start trace recording
+# トレース記録を開始
 playwright-cli tracing-start
 
-# Perform actions
+# アクションを実行
 playwright-cli open https://example.com
 playwright-cli click e1
 playwright-cli fill e2 "test"
 
-# Stop trace recording
+# トレース記録を停止
 playwright-cli tracing-stop
 ```
 
 ## Trace Output Files
 
-When you start tracing, Playwright creates a `traces/` directory with several files:
+トレースを開始すると、Playwright は複数のファイルを含む `traces/` ディレクトリを作成します。
 
 ### `trace-{timestamp}.trace`
 
-**Action log** - The main trace file containing:
-- Every action performed (clicks, fills, navigations)
-- DOM snapshots before and after each action
-- Screenshots at each step
-- Timing information
-- Console messages
-- Source locations
+**Action log** - 以下を含むメインのトレースファイル:
+- 実行されたすべてのアクション（clicks、fills、navigations）
+- 各アクション前後の DOM スナップショット
+- 各ステップでのスクリーンショット
+- タイミング情報
+- コンソールメッセージ
+- ソース位置
 
 ### `trace-{timestamp}.network`
 
-**Network log** - Complete network activity:
-- All HTTP requests and responses
-- Request headers and bodies
-- Response headers and bodies
-- Timing (DNS, connect, TLS, TTFB, download)
-- Resource sizes
-- Failed requests and errors
+**Network log** - 完全なネットワークアクティビティ:
+- すべての HTTP リクエストとレスポンス
+- リクエストのヘッダーとボディ
+- レスポンスのヘッダーとボディ
+- タイミング（DNS、connect、TLS、TTFB、download）
+- リソースサイズ
+- 失敗したリクエストとエラー
 
 ### `resources/`
 
-**Resources directory** - Cached resources:
-- Images, fonts, stylesheets, scripts
-- Response bodies for replay
-- Assets needed to reconstruct page state
+**Resources directory** - キャッシュされたリソース:
+- 画像、フォント、スタイルシート、スクリプト
+- リプレイ用のレスポンスボディ
+- ページ状態を再構築するために必要なアセット
 
 ## What Traces Capture
 
 | Category | Details |
 |----------|---------|
-| **Actions** | Clicks, fills, hovers, keyboard input, navigations |
-| **DOM** | Full DOM snapshot before/after each action |
-| **Screenshots** | Visual state at each step |
-| **Network** | All requests, responses, headers, bodies, timing |
-| **Console** | All console.log, warn, error messages |
-| **Timing** | Precise timing for each operation |
+| **Actions** | クリック、入力、ホバー、キーボード入力、ナビゲーション |
+| **DOM** | 各アクション前後の完全な DOM スナップショット |
+| **Screenshots** | 各ステップでの視覚的な状態 |
+| **Network** | すべてのリクエスト、レスポンス、ヘッダー、ボディ、タイミング |
+| **Console** | すべての console.log、warn、error メッセージ |
+| **Timing** | 各操作の正確なタイミング |
 
 ## Use Cases
 
@@ -67,11 +67,11 @@ When you start tracing, Playwright creates a `traces/` directory with several fi
 playwright-cli tracing-start
 playwright-cli open https://app.example.com
 
-# This click fails - why?
+# このクリックは失敗する - なぜ？
 playwright-cli click e5
 
 playwright-cli tracing-stop
-# Open trace to see DOM state when click was attempted
+# トレースを開いて、クリックが試行されたときの DOM 状態を確認する
 ```
 
 ### Analyzing Performance
@@ -81,13 +81,13 @@ playwright-cli tracing-start
 playwright-cli open https://slow-site.com
 playwright-cli tracing-stop
 
-# View network waterfall to identify slow resources
+# ネットワークウォーターフォールを表示して、遅いリソースを特定する
 ```
 
 ### Capturing Evidence
 
 ```bash
-# Record a complete user flow for documentation
+# ドキュメント用に完全なユーザーフローを記録する
 playwright-cli tracing-start
 
 playwright-cli open https://app.example.com/checkout
@@ -97,43 +97,43 @@ playwright-cli fill e3 "123"
 playwright-cli click e4
 
 playwright-cli tracing-stop
-# Trace shows exact sequence of events
+# トレースには正確なイベントの順序が表示される
 ```
 
 ## Trace vs Video vs Screenshot
 
 | Feature | Trace | Video | Screenshot |
 |---------|-------|-------|------------|
-| **Format** | .trace file | .webm video | .png/.jpeg image |
-| **DOM inspection** | Yes | No | No |
-| **Network details** | Yes | No | No |
-| **Step-by-step replay** | Yes | Continuous | Single frame |
-| **File size** | Medium | Large | Small |
-| **Best for** | Debugging | Demos | Quick capture |
+| **Format** | .trace ファイル | .webm 動画 | .png/.jpeg 画像 |
+| **DOM inspection** | あり | なし | なし |
+| **Network details** | あり | なし | なし |
+| **Step-by-step replay** | あり | 連続 | 単一フレーム |
+| **File size** | 中 | 大 | 小 |
+| **Best for** | デバッグ | デモ | クイックキャプチャ |
 
 ## Best Practices
 
 ### 1. Start Tracing Before the Problem
 
 ```bash
-# Trace the entire flow, not just the failing step
+# 失敗するステップだけでなく、フロー全体をトレースする
 playwright-cli tracing-start
 playwright-cli open https://example.com
-# ... all steps leading to the issue ...
+# ... 問題に至るまでのすべてのステップ ...
 playwright-cli tracing-stop
 ```
 
 ### 2. Clean Up Old Traces
 
-Traces can consume significant disk space:
+トレースは大量のディスク容量を消費する可能性があります:
 
 ```bash
-# Remove traces older than 7 days
+# 7 日より古いトレースを削除する
 find .playwright-cli/traces -mtime +7 -delete
 ```
 
 ## Limitations
 
-- Traces add overhead to automation
-- Large traces can consume significant disk space
-- Some dynamic content may not replay perfectly
+- トレースは自動化にオーバーヘッドを追加する
+- 大きなトレースは大量のディスク容量を消費する可能性がある
+- 一部の動的コンテンツは完全にはリプレイされない場合がある

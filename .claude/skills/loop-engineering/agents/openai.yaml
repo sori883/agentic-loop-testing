@@ -1,4 +1,0 @@
-interface:
-  display_name: "ループエンジニアリング"
-  short_description: "作成者/確認者分離型のエージェントループを動かす"
-  default_prompt: "$loop-engineering を使って、作成者/確認者分離と設定済みメモリバックエンドを前提にコーディングエージェントループを実行してください。"

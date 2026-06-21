@@ -1,44 +1,44 @@
 ---
 name: playwright-cli
-description: Automate browser interactions, test web pages and work with Playwright tests.
+description: Web UI を持つ対象プロジェクトで、ブラウザ操作の自動化・Web ページの動作確認・E2E / 受け入れテストの実装と実行を行うときに使う。ページ遷移、フォーム入力、要素検証、スクリーンショット、トレース取得、テスト生成を Playwright CLI 経由で扱う。ループ自動工程には組み込まず、controller が手動で起動する補助 skill。agent loop 定義そのもの（Web UI を持たない作業）には使わない。
 allowed-tools: Bash(playwright-cli:*) Bash(npx:*) Bash(npm:*)
 ---
 
-# Browser Automation with playwright-cli
+# playwright-cli によるブラウザ自動化
 
-## Quick start
+## クイックスタート
 
 ```bash
-# open new browser
+# 新しいブラウザを開く
 playwright-cli open
-# navigate to a page
+# ページに移動する
 playwright-cli goto https://playwright.dev
-# interact with the page using refs from the snapshot
+# snapshot の ref を使ってページを操作する
 playwright-cli click e15
 playwright-cli type "page.click"
 playwright-cli press Enter
-# take a screenshot (rarely used, as snapshot is more common)
+# スクリーンショットを撮る（snapshot のほうが一般的なため、ほとんど使わない）
 playwright-cli screenshot
-# close the browser
+# ブラウザを閉じる
 playwright-cli close
 ```
 
-## Commands
+## コマンド
 
-### Core
+### 基本
 
 ```bash
 playwright-cli open
-# open and navigate right away
+# 開いてすぐに移動する
 playwright-cli open https://example.com/
 playwright-cli goto https://playwright.dev
 playwright-cli type "search query"
 playwright-cli click e3
 playwright-cli dblclick e7
-# --submit presses Enter after filling the element
+# --submit は要素への入力後に Enter を押す
 playwright-cli fill e5 "user@example.com"  --submit
 playwright-cli drag e2 e8
-# drop files or data onto an element (from outside the page)
+# 要素にファイルやデータをドロップする（ページの外部から）
 playwright-cli drop e4 --path=./image.png
 playwright-cli drop e4 --data="text/plain=hello world"
 playwright-cli hover e4
@@ -49,7 +49,7 @@ playwright-cli uncheck e12
 playwright-cli snapshot
 playwright-cli eval "document.title"
 playwright-cli eval "el => el.textContent" e5
-# get element id, class, or any attribute not visible in the snapshot
+# snapshot には表示されない id、class、その他の属性を取得する
 playwright-cli eval "el => el.id" e5
 playwright-cli eval "el => el.getAttribute('data-testid')" e5
 playwright-cli dialog-accept
@@ -59,7 +59,7 @@ playwright-cli resize 1920 1080
 playwright-cli close
 ```
 
-### Navigation
+### ナビゲーション
 
 ```bash
 playwright-cli go-back
@@ -67,7 +67,7 @@ playwright-cli go-forward
 playwright-cli reload
 ```
 
-### Keyboard
+### キーボード
 
 ```bash
 playwright-cli press Enter
@@ -76,7 +76,7 @@ playwright-cli keydown Shift
 playwright-cli keyup Shift
 ```
 
-### Mouse
+### マウス
 
 ```bash
 playwright-cli mousemove 150 300
@@ -87,7 +87,7 @@ playwright-cli mouseup right
 playwright-cli mousewheel 0 100
 ```
 
-### Save as
+### 保存
 
 ```bash
 playwright-cli screenshot
@@ -96,7 +96,7 @@ playwright-cli screenshot --filename=page.png
 playwright-cli pdf --filename=page.pdf
 ```
 
-### Tabs
+### タブ
 
 ```bash
 playwright-cli tab-list
@@ -107,14 +107,14 @@ playwright-cli tab-close 2
 playwright-cli tab-select 0
 ```
 
-### Storage
+### ストレージ
 
 ```bash
 playwright-cli state-save
 playwright-cli state-save auth.json
 playwright-cli state-load auth.json
 
-# Cookies
+# Cookie
 playwright-cli cookie-list
 playwright-cli cookie-list --domain=example.com
 playwright-cli cookie-get session_id
@@ -138,7 +138,7 @@ playwright-cli sessionstorage-delete step
 playwright-cli sessionstorage-clear
 ```
 
-### Network
+### ネットワーク
 
 ```bash
 playwright-cli route "**/*.jpg" --status=404
@@ -163,23 +163,23 @@ playwright-cli video-start video.webm
 playwright-cli video-chapter "Chapter Title" --description="Details" --duration=2000
 playwright-cli video-stop
 
-# launch the dashboard with annotation prompt to ask the user for input
+# ユーザーに入力を求めるための注釈プロンプト付きでダッシュボードを起動する
 playwright-cli show --annotate
 
-# generate a Playwright locator for an element from its ref or selector
+# 要素の ref またはセレクタから Playwright locator を生成する
 playwright-cli generate-locator e5 --raw
 
-# show a persistent highlight overlay for an element, optionally with a custom style
+# 要素に対して永続的なハイライトオーバーレイを表示する（任意でカスタムスタイルを指定可能）
 playwright-cli highlight e5
 playwright-cli highlight e5 --style="outline: 3px dashed red"
-# hide a single element highlight, or all page highlights when no target is given
+# 単一の要素のハイライトを隠す。対象を指定しない場合はページ上のすべてのハイライトを隠す
 playwright-cli highlight e5 --hide
 playwright-cli highlight --hide
 ```
 
-## Raw output
+## Raw 出力
 
-The global `--raw` option strips page status, generated code, and snapshot sections from the output, returning only the result value. Use it to pipe command output into other tools. Commands that don't produce output return nothing.
+グローバルオプション `--raw` は、出力からページステータス、生成されたコード、snapshot セクションを取り除き、結果の値のみを返します。コマンドの出力を他のツールにパイプする際に使用します。出力を生成しないコマンドは何も返しません。
 
 ```bash
 playwright-cli --raw eval "JSON.stringify(performance.timing)" | jq '.loadEventEnd - .navigationStart'
@@ -192,48 +192,48 @@ TOKEN=$(playwright-cli --raw cookie-get session_id)
 playwright-cli --raw localstorage-get theme
 ```
 
-For structured output wrapping every reply as JSON, pass --json
+すべての応答を JSON として包む構造化出力が必要な場合は --json を指定します
 ```bash
 playwright-cli list --json
 ```
 
-## Open parameters
+## open のパラメータ
 ```bash
-# Use specific browser when creating session
+# セッション作成時に特定のブラウザを使用する
 playwright-cli open --browser=chrome
 playwright-cli open --browser=firefox
 playwright-cli open --browser=webkit
 playwright-cli open --browser=msedge
 
-# Use persistent profile (by default profile is in-memory)
+# 永続プロファイルを使用する（デフォルトではプロファイルはメモリ上にある）
 playwright-cli open --persistent
-# Use persistent profile with custom directory
+# カスタムディレクトリで永続プロファイルを使用する
 playwright-cli open --profile=/path/to/profile
 
-# Connect to browser via Playwright Extension
+# Playwright Extension 経由でブラウザに接続する
 playwright-cli attach --extension=chrome
 
-# Connect to a running Chrome or Edge by channel name
+# 実行中の Chrome または Edge にチャンネル名で接続する
 playwright-cli attach --cdp=chrome
 playwright-cli attach --cdp=msedge
 
-# Connect to a running browser via CDP endpoint
+# CDP エンドポイント経由で実行中のブラウザに接続する
 playwright-cli attach --cdp=http://localhost:9222
 
-# Start with config file
+# 設定ファイルを指定して起動する
 playwright-cli open --config=my-config.json
 
-# Close the browser
+# ブラウザを閉じる
 playwright-cli close
-# Detach from an attached browser (leaves the external browser running)
+# アタッチしたブラウザからデタッチする（外部ブラウザは起動したまま）
 playwright-cli -s=msedge detach
-# Delete user data for the default session
+# デフォルトセッションのユーザーデータを削除する
 playwright-cli delete-data
 ```
 
-## Snapshots
+## Snapshot
 
-After each command, playwright-cli provides a snapshot of the current browser state.
+各コマンドの実行後、playwright-cli は現在のブラウザ状態の snapshot を提供します。
 
 ```bash
 > playwright-cli goto https://example.com
@@ -244,42 +244,42 @@ After each command, playwright-cli provides a snapshot of the current browser st
 [Snapshot](.playwright-cli/page-2026-02-14T19-22-42-679Z.yml)
 ```
 
-You can also take a snapshot on demand using `playwright-cli snapshot` command. All the options below can be combined as needed.
+`playwright-cli snapshot` コマンドを使って必要なときに snapshot を取得することもできます。以下のオプションは必要に応じて組み合わせられます。
 
 ```bash
-# default - save to a file with timestamp-based name
+# デフォルト - タイムスタンプベースの名前でファイルに保存する
 playwright-cli snapshot
 
-# save to file, use when snapshot is a part of the workflow result
+# ファイルに保存する。snapshot がワークフローの成果物の一部である場合に使用する
 playwright-cli snapshot --filename=after-click.yaml
 
-# snapshot an element instead of the whole page
+# ページ全体ではなく要素の snapshot を取得する
 playwright-cli snapshot "#main"
 
-# limit snapshot depth for efficiency, take a partial snapshot afterwards
+# 効率化のため snapshot の深さを制限し、その後で部分的な snapshot を取得する
 playwright-cli snapshot --depth=4
 playwright-cli snapshot e34
 
-# include each element's bounding box as [box=x,y,width,height]
+# 各要素のバウンディングボックスを [box=x,y,width,height] として含める
 playwright-cli snapshot --boxes
 ```
 
-## Targeting elements
+## 要素の指定
 
-By default, use refs from the snapshot to interact with page elements.
+デフォルトでは、snapshot の ref を使ってページ要素を操作します。
 
 ```bash
-# get snapshot with refs
+# ref 付きの snapshot を取得する
 playwright-cli snapshot
 
-# interact using a ref
+# ref を使って操作する
 playwright-cli click e15
 ```
 
-You can also use css selectors or Playwright locators.
+CSS セレクタや Playwright locator を使うこともできます。
 
 ```bash
-# css selector
+# CSS セレクタ
 playwright-cli click "#main > button.submit"
 
 # role locator
@@ -289,39 +289,39 @@ playwright-cli click "getByRole('button', { name: 'Submit' })"
 playwright-cli click "getByTestId('submit-button')"
 ```
 
-## Browser Sessions
+## ブラウザセッション
 
 ```bash
-# create new browser session named "mysession" with persistent profile
+# 永続プロファイルで "mysession" という名前の新しいブラウザセッションを作成する
 playwright-cli -s=mysession open example.com --persistent
-# same with manually specified profile directory (use when requested explicitly)
+# 同様だが、プロファイルディレクトリを手動で指定する（明示的に要求された場合に使用する）
 playwright-cli -s=mysession open example.com --profile=/path/to/profile
 playwright-cli -s=mysession click e6
-playwright-cli -s=mysession close  # stop a named browser
-playwright-cli -s=mysession delete-data  # delete user data for persistent session
+playwright-cli -s=mysession close  # 名前付きブラウザを停止する
+playwright-cli -s=mysession delete-data  # 永続セッションのユーザーデータを削除する
 
 playwright-cli list
-# Close all browsers
+# すべてのブラウザを閉じる
 playwright-cli close-all
-# Forcefully kill all browser processes
+# すべてのブラウザプロセスを強制終了する
 playwright-cli kill-all
 ```
 
-## Installation
+## インストール
 
-If global `playwright-cli` command is not available, try a local version via `npx playwright-cli`:
+グローバルの `playwright-cli` コマンドが利用できない場合は、`npx playwright-cli` でローカルバージョンを試します。
 
 ```bash
 npx --no-install playwright-cli --version
 ```
 
-When local version is available, use `npx playwright-cli` in all commands. Otherwise, install `playwright-cli` as a global command:
+ローカルバージョンが利用できる場合は、すべてのコマンドで `npx playwright-cli` を使用します。利用できない場合は、`playwright-cli` をグローバルコマンドとしてインストールします。
 
 ```bash
 npm install -g @playwright/cli@latest
 ```
 
-## Example: Form submission
+## 例: フォームの送信
 
 ```bash
 playwright-cli open https://example.com/form
@@ -334,7 +334,7 @@ playwright-cli snapshot
 playwright-cli close
 ```
 
-## Example: Multi-tab workflow
+## 例: 複数タブのワークフロー
 
 ```bash
 playwright-cli open https://example.com
@@ -345,7 +345,7 @@ playwright-cli snapshot
 playwright-cli close
 ```
 
-## Example: Debugging with DevTools
+## 例: DevTools を使ったデバッグ
 
 ```bash
 playwright-cli open https://example.com
@@ -365,24 +365,24 @@ playwright-cli tracing-stop
 playwright-cli close
 ```
 
-## Example: Interactive session
+## 例: インタラクティブセッション
 
-Ask the user to annotate the UI. User can provide contextual tasks or ask contextual questions using annotations:
+ユーザーに UI への注釈を求めます。ユーザーは注釈を使って文脈に応じたタスクを指示したり、質問したりできます。
 
 ```bash
 playwright-cli open https://example.com
 playwright-cli show --annotate
 ```
 
-## Specific tasks
+## 個別タスク
 
-* **Running and Debugging Playwright tests** [references/playwright-tests.md](references/playwright-tests.md)
-* **Request mocking** [references/request-mocking.md](references/request-mocking.md)
-* **Running Playwright code** [references/running-code.md](references/running-code.md)
-* **Browser session management** [references/session-management.md](references/session-management.md)
-* **Spec-driven testing (plan / generate / heal)** [references/spec-driven-testing.md](references/spec-driven-testing.md)
-* **Storage state (cookies, localStorage)** [references/storage-state.md](references/storage-state.md)
-* **Test generation** [references/test-generation.md](references/test-generation.md)
-* **Tracing** [references/tracing.md](references/tracing.md)
-* **Video recording** [references/video-recording.md](references/video-recording.md)
-* **Inspecting element attributes** [references/element-attributes.md](references/element-attributes.md)
+* **Playwright テストの実行とデバッグ** [references/playwright-tests.md](references/playwright-tests.md)
+* **リクエストのモック** [references/request-mocking.md](references/request-mocking.md)
+* **Playwright コードの実行** [references/running-code.md](references/running-code.md)
+* **ブラウザセッションの管理** [references/session-management.md](references/session-management.md)
+* **仕様駆動テスト（plan / generate / heal）** [references/spec-driven-testing.md](references/spec-driven-testing.md)
+* **ストレージ状態（cookie、localStorage）** [references/storage-state.md](references/storage-state.md)
+* **テストの生成** [references/test-generation.md](references/test-generation.md)
+* **トレーシング** [references/tracing.md](references/tracing.md)
+* **動画の記録** [references/video-recording.md](references/video-recording.md)
+* **要素属性の検査** [references/element-attributes.md](references/element-attributes.md)
